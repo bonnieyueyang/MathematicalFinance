@@ -34,18 +34,6 @@ for (i in c(1:11)){
 }
 view(ytm)
 
-names(Forwards)=fwdscolumnnames
-bondsDirty=data.frame(bondsDirty,RawSpots)
-
-############## Interpolation ##############
-ytm2=data.frame(matrix(ncol=10, nrow=11))
-for (i in c(1:10)){
-  for (j in c(1:10)){
-    ytm2[j,i]=approx(df$monthsTillMaturity, ytm[[i]],xout=6*j)$y
-  }
-}
-rownames(ytm2)=seq(1,6,0.5)
-view(ytm2)
 
 ############## Plot YTM ##############
 plot(seq(1,6,0.5), ytm2$X1,type="l",ylim=c(0.015,0.021), col=1,
@@ -70,7 +58,7 @@ for (i in c(1:10)){
   spot_rate[1,i]=2*((price/(coupon+100))^(-1/(2*ttm))-1)
 }
 
-# Bootsrapping 
+# Bootsrapping - Induction
 spot_rate=data.frame(matrix(ncol=10, nrow=11))
 for (i in c(2:11)){
   for (j in c(1:10)){
@@ -93,7 +81,7 @@ View(spot_rate)
 spot_rate2=data.frame(matrix(ncol=10, nrow=11))
 for (i in c(1:10)){
   for (j in c(1:10)){
-    spot_rate2[j,i]=approx(df$monthsTillMaturity,spot_rate[[i]],xout=6*j)$y
+    spot_rate2[j,i]=approx(df$monthsTillMaturity,spot_rate[[i]],xout=j)$y
   }
 }
 rownames(spot_rate2)=seq(1,6,0.5)
@@ -142,10 +130,13 @@ legend("topleft", days, lwd=c(2,2),cex=.5, col=(1:10))
 
 
 ############ Calculate Covariance Matrices for Log-return of Yields ############
-log_return_yields1=log_return_yields2=log_return_yields3=
-  log_return_yields4=log_return_yields5=vector("numeric", length=9)
-for (i in c(1:9))
-{
+log_return_yields1=vector("numeric", length=9)
+log_return_yields2=vector("numeric", length=9)
+log_return_yields3=vector("numeric", length=9)
+log_return_yields4=vector("numeric", length=9)
+log_return_yields5=vector("numeric", length=9)
+
+for (i in c(1:9)){
   log_return_yields1[i]=log(ytm2[2,i]/ytm2[2,i+1])
   log_return_yields2[i]=log(ytm2[4,i]/ytm2[4,i+1])
   log_return_yields3[i]=log(ytm2[6,i]/ytm2[4,i+1])
@@ -161,7 +152,10 @@ covariance_of_log_returns=cov(log_returns_yields,log_returns_yields)
 view(covariance_of_log_returns)
 
 ############ Calculate Covariance Matrices for Forward Rates ################
-fwd1=fwd2=fwd3=fwd4=vector("numeric", length=9)
+fwd1=vector("numeric", length=9)
+fwd2=vector("numeric", length=9)
+fwd3=vector("numeric", length=9)
+fwd4=vector("numeric", length=9)
 for(i in c(1:9)){
   fwd1[i]=log(forward_rate[1,i]/forward_rate[1,i+1])
   fwd2[i]=log(forward_rate[2,i]/forward_rate[2,i+1])
